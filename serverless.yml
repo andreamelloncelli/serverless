@@ -1,0 +1,46 @@
+service: eqh-kinesis-example # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  stage: dev
+  profile: earthcloud
+  region: eu-west-1
+  iamRoleStatements:
+    -  Effect: "Allow"
+       Action:
+         - "kinesis:*"
+       Resource:
+         Fn::GetAtt:
+            - KinesisOutput
+            - Arn
+  environment:
+    OUTPUT_STREAM: eqh-output
+
+functions:
+  consumer:
+    handler: handler.compute
+
+resources:
+  Resources:
+    KinesisOutput:
+      Type: AWS::Kinesis::Stream
+      Properties: 
+        Name: ${self:provider.environment.OUTPUT_STREAM}
+        ShardCount: 1
+        Tags:
+          - Key: Name
+            Value: EarthQuakeHackathon
+    LambdaMapping:
+      Type: AWS::Lambda::EventSourceMapping
+      Properties:
+        BatchSize: 10
+        EventSourceArn:
+          Fn::GetAtt:
+            - KinesisOutput
+            - Arn
+        FunctionName:
+          Fn::GetAtt:
+            - ConsumerLambdaFunction
+            - Arn
+        StartingPosition: LATEST
