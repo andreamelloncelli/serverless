@@ -1,5 +1,7 @@
 # serverless
-serverless sketch for [Earthquake Hackathon](http://www.earthquakehackathon.it/)
+sample serverless sketch for [Earthquake Hackathon](http://www.earthquakehackathon.it/)
+
+(kinesis stream attached to a lambda function)
 
 # prerequisites
 
